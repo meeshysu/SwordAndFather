@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using Dapper;
 using SwordAndFather.Models;
@@ -23,34 +24,39 @@ namespace SwordAndFather.Data
                 {
                     return newUser;
                 }
-
-
-
-                //connection.Open();
-                //var insertUserCommand = connection.CreateCommand();
-                //insertUserCommand.CommandText = $@"Insert into users(username, password)
-                //                              Output inserted.*
-                //                              Values(@username', @password)";
-
-                //insertUserCommand.Parameters.AddWithValue("username", username); //username from our AddUser parameter.
-                //insertUserCommand.Parameters.AddWithValue("password", username); 
-
-                //var reader = insertUserCommand.ExecuteReader();
-
-                //if (reader.Read())
-                //{
-                //    var insertedUsername = reader["username"].ToString();
-                //    var insertedPassword = reader["password"].ToString();
-                //    var insertedId = (int)reader["Id"];
-
-                //    var newUser = new User(insertedUsername, insertedPassword) { Id = insertedId };
-                //    return newUser;
-                //}
             }
             throw new System.Exception("No user found");
         }
 
+        public void DeleteUser(int id)
+        {
+            using (var db = new SqlConnection(ConnectionString))
+            {
+                var rowsAffected = db.Execute("Delete From Users where Id = @id", new { id });
 
+                if (rowsAffected != 1)
+                {
+                    throw new Exception("Didn't do right.");
+                }
+            }
+        }
+        //number of rows affected
+        //if you don't define the parameter, it won't have a value. 
+
+        public User UpdateUser(User userToUpdate)
+        {
+            using (var db = new SqlConnection(ConnectionString))
+            {
+                var rowsAffected = db.Execute(@"Update Users 
+                            Set username = @username,
+                                password = @password
+                            Where id = @id", userToUpdate);
+
+                if (rowsAffected == 1)
+                    return userToUpdate;
+            }
+            throw new Exception("Could not update user");
+        }
 
         public IEnumerable<User> GetAll()
         {
