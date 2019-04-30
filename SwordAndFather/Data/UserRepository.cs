@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.SqlClient;
+using Dapper;
 using SwordAndFather.Models;
 
 namespace SwordAndFather.Data
@@ -18,7 +19,7 @@ namespace SwordAndFather.Data
                                               Values(@username', @password)";
 
                 insertUserCommand.Parameters.AddWithValue("username", username); //username from our AddUser parameter.
-                insertUserCommand.Parameters.AddWithValue("password", username);
+                insertUserCommand.Parameters.AddWithValue("password", username); 
 
                 var reader = insertUserCommand.ExecuteReader();
 
@@ -34,41 +35,38 @@ namespace SwordAndFather.Data
             }
             throw new System.Exception("No user found");
         }
-        
 
 
-        public List<User> GetAll()
+
+        public IEnumerable<User> GetAll()
         {
-            //create a list of users
-            var users = new List<User>();
-
             //connect to your local host to get your database
-            var connection = new SqlConnection("Server=localhost;Database=SwordAndFather;Trusted_Connection=True;");
-            connection.Open();
-
-            //create the command that gets all users: all the information you want from the user
-            var getAllUsersCommand = connection.CreateCommand();
-            getAllUsersCommand.CommandText = @"select username, password, id from users";
-
-            //send command thru connection
-            var reader = getAllUsersCommand.ExecuteReader();
-
-            //read the results, map it to a type and repository list
-            while (reader.Read())//direct cast
+            using (var db = new SqlConnection(ConnectionString))
             {
-                var id = (int)reader["Id"];
-                var username = reader["username"].ToString();
-                var password = reader["password"].ToString();
-                var user = new User(username, password) { Id = id };
-
-                users.Add(user);
+                return db.Query<User>("select username, password, id from users");
             }
-
-            //close the conection
-            connection.Close();
-
-            //return the list
-            return users;
         }
     }
 }
+
+//create the command that gets all users: all the information you want from the user
+//var getAllUsersCommand = connection.CreateCommand();
+//getAllUsersCommand.CommandText = @"select username, password, id from users";
+
+////send command thru connection
+//var reader = getAllUsersCommand.ExecuteReader();
+
+////read the results, map it to a type and repository list
+//while (reader.Read())//direct cast
+//{
+//    var id = (int)reader["Id"];
+//    var username = reader["username"].ToString();
+//    var password = reader["password"].ToString();
+//    var user = new User(username, password) { Id = id };
+
+//    users.Add(user);
+//}
+
+//close the conection
+
+//return the list
