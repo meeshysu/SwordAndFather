@@ -10,28 +10,42 @@ namespace SwordAndFather.Data
         const string ConnectionString = "Server=localhost;Database=SwordAndFather;Trusted_Connection=True;";
         public User AddUser(string username, string password)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            using (var db = new SqlConnection(ConnectionString))
             {
-            connection.Open();
-                var insertUserCommand = connection.CreateCommand();
-                insertUserCommand.CommandText = $@"Insert into users(username, password)
-                                              Output inserted.*
-                                              Values(@username', @password)";
+                var newUser = db.QueryFirstOrDefault<User>(
+                    @"Insert into users(username, password)
+                    Output inserted.*
+                    Values(@username', @password)", 
+                    new {username, password}); //automatically sets the property with the same name
+                                               //it's an anonymous type passing in an object. but you don't have to create an anonymous one. 
 
-                insertUserCommand.Parameters.AddWithValue("username", username); //username from our AddUser parameter.
-                insertUserCommand.Parameters.AddWithValue("password", username); 
-
-                var reader = insertUserCommand.ExecuteReader();
-
-                if (reader.Read())
+                if (newUser != null)
                 {
-                    var insertedUsername = reader["username"].ToString();
-                    var insertedPassword = reader["password"].ToString();
-                    var insertedId = (int)reader["Id"];
-
-                    var newUser = new User(insertedUsername, insertedPassword) { Id = insertedId };
                     return newUser;
                 }
+
+
+
+                //connection.Open();
+                //var insertUserCommand = connection.CreateCommand();
+                //insertUserCommand.CommandText = $@"Insert into users(username, password)
+                //                              Output inserted.*
+                //                              Values(@username', @password)";
+
+                //insertUserCommand.Parameters.AddWithValue("username", username); //username from our AddUser parameter.
+                //insertUserCommand.Parameters.AddWithValue("password", username); 
+
+                //var reader = insertUserCommand.ExecuteReader();
+
+                //if (reader.Read())
+                //{
+                //    var insertedUsername = reader["username"].ToString();
+                //    var insertedPassword = reader["password"].ToString();
+                //    var insertedId = (int)reader["Id"];
+
+                //    var newUser = new User(insertedUsername, insertedPassword) { Id = insertedId };
+                //    return newUser;
+                //}
             }
             throw new System.Exception("No user found");
         }
