@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using Dapper;
 using SwordAndFather.Models;
 
@@ -63,7 +64,14 @@ namespace SwordAndFather.Data
             //connect to your local host to get your database
             using (var db = new SqlConnection(ConnectionString))
             {
-                return db.Query<User>("select username, password, id from users");
+                var users = db.Query<User>("select username, password, id from users").ToList();
+                var targets = db.Query<Target>("select * from Targets").ToList();
+
+                foreach (var user in users)
+                {
+                    user.Targets = targets.Where(target => target.UserId == user.Id).ToList();
+                }
+                return users;
             }
         }
     }
