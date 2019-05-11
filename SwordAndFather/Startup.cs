@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SwordAndFather.Data;
 
 namespace SwordAndFather
 {
@@ -26,6 +27,10 @@ namespace SwordAndFather
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.Configure<DbConfiguration>(Configuration);
+
+            services.AddTransient<TargetRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,4 +49,8 @@ namespace SwordAndFather
             app.UseMvc();
         }
     }
+        public class DbConfiguration
+        {
+        public string ConnectionString { get; set; }
+        }
 }
