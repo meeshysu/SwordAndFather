@@ -17,9 +17,9 @@ namespace SwordAndFather.Data
                 var newUser = db.QueryFirstOrDefault<User>(
                     @"Insert into users(username, password)
                     Output inserted.*
-                    Values(@username', @password)", 
-                    new {username, password}); //automatically sets the property with the same name
-                                               //it's an anonymous type passing in an object. but you don't have to create an anonymous one. 
+                    Values(@username', @password)",
+                    new { username, password }); //automatically sets the property with the same name
+                                                 //it's an anonymous type passing in an object. but you don't have to create an anonymous one. 
 
                 if (newUser != null)
                 {

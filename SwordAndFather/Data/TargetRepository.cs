@@ -32,10 +32,10 @@ namespace SwordAndFather.Data
 
                 var parameters = new
                 {
-                  Name = name,
-                  Location = location,
-                  FitnessLevel = fitnessLevel,
-                  UserId = userId
+                    Name = name,
+                    Location = location,
+                    FitnessLevel = fitnessLevel,
+                    UserId = userId
                 };
 
                 var newTarget = db.QueryFirstOrDefault<Target>(insertQuery, parameters);
